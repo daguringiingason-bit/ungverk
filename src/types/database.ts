@@ -18,6 +18,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_applications: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          message: string
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+          worker_id: string
+        }
+        Insert: never
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_categories: {
         Row: {
           active: boolean
@@ -226,6 +255,68 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_to_job: {
+        Args: { p_job_id: string; p_message?: string }
+        Returns: Database["public"]["Tables"]["job_applications"]["Row"]
+        SetofOptions: { from: "*"; to: "job_applications"; isOneToOne: true; isSetofReturn: false }
+      }
+      get_job_details: {
+        Args: { p_job_id: string }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          price_isk: number
+          category_name: string
+          safety_rules: string
+          municipality_name: string
+          area_label: string
+          starts_at: string
+          duration_minutes: number
+          min_age: number
+          job_status: Database["public"]["Enums"]["job_status"]
+          customer_first_name: string
+          customer_verified: boolean
+          can_apply: boolean
+          my_application_id: string | null
+          my_application_status: Database["public"]["Enums"]["application_status"] | null
+        }[]
+      }
+      get_job_feed: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          id: string
+          title: string
+          price_isk: number
+          category_name: string
+          municipality_name: string
+          area_label: string
+          starts_at: string
+          duration_minutes: number
+          has_applied: boolean
+        }[]
+      }
+      get_my_applications: {
+        Args: never
+        Returns: {
+          application_id: string
+          application_status: Database["public"]["Enums"]["application_status"]
+          applied_at: string
+          job_id: string
+          title: string
+          price_isk: number
+          municipality_name: string
+          area_label: string
+          starts_at: string
+          duration_minutes: number
+          job_status: Database["public"]["Enums"]["job_status"]
+        }[]
+      }
+      withdraw_application: {
+        Args: { p_application_id: string }
+        Returns: Database["public"]["Tables"]["job_applications"]["Row"]
+        SetofOptions: { from: "*"; to: "job_applications"; isOneToOne: true; isSetofReturn: false }
+      }
       age_in_years: { Args: { dob: string }; Returns: number }
       complete_onboarding: {
         Args: {
@@ -282,6 +373,7 @@ export type Database = {
       today_is: { Args: never; Returns: string }
     }
     Enums: {
+      application_status: "PENDING" | "SELECTED" | "NOT_SELECTED" | "WITHDRAWN"
       job_status:
         | "DRAFT"
         | "OPEN"
@@ -356,6 +448,7 @@ export type Enums<
 export const Constants = {
   public: {
     Enums: {
+      application_status: ["PENDING", "SELECTED", "NOT_SELECTED", "WITHDRAWN"],
       job_status: [
         "DRAFT",
         "OPEN",
