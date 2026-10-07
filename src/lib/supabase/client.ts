@@ -5,14 +5,14 @@ import { AppState, Platform } from 'react-native';
 
 import type { Database } from '@/types/database';
 
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const publishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+// Defaults point at the ungVERK pilot project so the app runs without a .env file.
+// Both values are PUBLIC by design (the publishable key only grants what RLS allows).
+// Override them in .env to use another project. Never put a secret/service-role key here.
+const DEFAULT_URL = 'https://llmwqlxtgilpvgiqskth.supabase.co';
+const DEFAULT_PUBLISHABLE_KEY = 'sb_publishable_9d-DbX5NFq0pDX2KL5f2UA_zlZCWsu5';
 
-if (!url || !publishableKey) {
-  throw new Error(
-    'Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Copy .env.example to .env.',
-  );
-}
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL || DEFAULT_URL;
+const publishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY || DEFAULT_PUBLISHABLE_KEY;
 
 // Only the publishable key ever lives in the app. All authorization is enforced by
 // Postgres RLS, column grants and security-definer functions on the server.

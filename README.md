@@ -31,7 +31,7 @@ permissions and state transitions are enforced by Postgres (RLS, column grants,
 git clone <repo>
 cd ungverk
 npm install
-cp .env.example .env      # then fill in the two values (see below)
+# optional: cp .env.example .env  (defaults point at the pilot project)
 npx expo start            # scan the QR code with Expo Go
 ```
 
