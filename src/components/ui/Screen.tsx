@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, spacing } from '@/theme';
@@ -12,11 +12,22 @@ type Props = {
   footer?: ReactNode;
   /** Tab screens already sit above the tab bar, so they skip the bottom inset. */
   edges?: ('top' | 'bottom')[];
+  /** Pull-to-refresh for scroll screens. */
+  onRefresh?: () => void;
+  refreshing?: boolean;
 };
 
-export function Screen({ children, scroll = false, footer, edges = ['top', 'bottom'] }: Props) {
+export function Screen({ children, scroll = false, footer, edges = ['top', 'bottom'], onRefresh, refreshing = false }: Props) {
   const body = scroll ? (
-    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        ) : undefined
+      }
+    >
       {children}
     </ScrollView>
   ) : (

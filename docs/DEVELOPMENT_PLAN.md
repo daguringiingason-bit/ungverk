@@ -13,7 +13,7 @@ Supabase security advisor, and a short report.
 | 1 | Foundation | Expo SDK 57, Expo Router, strict TS, theme, env, Supabase client | ✅ |
 | 2 | Auth + profiles + roles | Email OTP, `profiles`, `complete_onboarding()`, RLS, column grants, age bounds in `platform_settings`, municipalities | ✅ |
 | 3 | Jobs + eligibility | `job_categories` per reglugerð 426/1999, `jobs` + separate `job_private_details`, `create_job()`, `worker_can_take_job()` (age, customer min age, hours), post-job form, my-jobs list, local seed, age test matrix | ✅ |
-| 4 | Feed + details + apply | Server-side feed function (open, municipality, age-eligible, unassigned; no private fields), job details, `job_applications` (unique per worker/job, only open + eligible jobs) | |
+| 4 | Feed + details + apply | Server-side feed function (open, municipality, age-eligible, unassigned; no private fields), job details, `job_applications` (unique per worker/job, only open + eligible jobs) | ✅ |
 | 5 | Assignment + state machine | Atomic `select_worker()` (row lock; selected/not-selected applications), transition functions — no client status writes; address revealed to assigned worker only | |
 | 6 | Completion + reviews | start / worker-complete / customer-confirm, `reviews` (one per completed job, customer → worker), real completed-job count and rating on profiles | |
 | 7 | Reports + admin + hardening | `reports`, admin screens (jobs, users, reports, suspend, cancel), event log for pilot analytics, full security test pass | |

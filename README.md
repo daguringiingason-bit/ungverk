@@ -106,6 +106,15 @@ with `ALL PASSED` or `FAILED`.
   (63 combinations), customer's min-age request, 20:00/22:00 and 2 h/7 h working-time
   rules, `create_job()` validation, workers and other customers cannot read jobs or
   addresses, category ages are configuration.
+- `supabase/tests/feed_and_applications.sql` (26 checks): feed only shows open, upcoming,
+  approved, age-eligible jobs in the worker's municipality; no address/customer id/surname/DOB
+  in worker functions; no applying twice, to ineligible or closed jobs; nobody can set an
+  application to SELECTED; applications visible only to the worker, the job's customer and admins.
+
+The Supabase security advisor lists every `security definer` function callable by signed-in
+users. That is intentional: those functions *are* the API (`complete_onboarding`,
+`create_job`, `get_job_feed`, `get_job_details`, `apply_to_job`, `withdraw_application`,
+`get_my_applications`, `is_admin`), and each checks the caller's role itself.
 
 ## Data model (so far)
 
@@ -117,6 +126,7 @@ with `ALL PASSED` or `FAILED`.
 | `job_categories` | 9 categories with min/max age, safety rules, risk, manual approval, and the legal basis for each | Signed-in users read. Team edits via SQL. |
 | `jobs` | Public job fields, status, customer's min-age request | Customer reads own jobs; admins all. **No client writes** — created via `create_job()`; status changes via functions (stage 5). |
 | `job_private_details` | Exact address / coordinates, separate from public fields | Job owner and admins only (assigned worker from stage 5). |
+| `job_applications` | One per worker per job; PENDING → SELECTED / NOT_SELECTED / WITHDRAWN | Worker (own), the job's customer, admins. Written only via `apply_to_job()` / `withdraw_application()`. |
 
 Age is **never stored** — it is computed from `date_of_birth`. Whether a worker may take a
 job is decided only by `public.worker_can_take_job()` (age on the job date, category,
@@ -159,6 +169,15 @@ and all names start with “Próf”. The SQL test suites create and roll back t
 
 ## Current status
 
+**Stage 4 done (worker feed, job details, applications):**
+
+- “Verk nálægt þér”: server-filtered feed with pull-to-refresh and paging
+- Job details with safety rules, customer first name, no address; apply with an optional
+  message; withdraw while pending
+- “Umsóknir” shows the worker's applications and their status
+- Customers see how many have applied on each job
+- 26/26 SQL checks
+
 **Stage 3 done (categories, jobs, age eligibility):**
 
 - 9 job categories with ages based on reglugerð 426/1999; customers can ask for older workers
@@ -176,8 +195,8 @@ and all names start with “Próf”. The SQL test suites create and roll back t
 - Suspended accounts are blocked
 - 20/20 SQL security checks, 19 unit tests
 
-**Not built yet** (screens say so honestly, no fake data): worker job feed, applications,
-assignment, completion, reviews, reports, admin tools. See the plan.
+**Not built yet** (screens say so honestly, no fake data): choosing a worker, assignment,
+completion, reviews, reports, admin tools. See the plan.
 
 ## Known limitations
 

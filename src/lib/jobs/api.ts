@@ -12,6 +12,7 @@ export type CustomerJob = Pick<
 > & {
   category: { name: string } | null;
   municipality: { name: string } | null;
+  applications: { status: Enums<'application_status'> }[];
 };
 
 export async function fetchCategories(): Promise<JobCategory[]> {
@@ -29,7 +30,7 @@ export async function fetchMyJobs(customerId: string): Promise<CustomerJob[]> {
   const { data, error } = await supabase
     .from('jobs')
     .select(
-      'id, title, price_isk, area_label, starts_at, duration_minutes, status, min_age, requires_approval, approved_at, category:job_categories(name), municipality:municipalities(name)',
+      'id, title, price_isk, area_label, starts_at, duration_minutes, status, min_age, requires_approval, approved_at, category:job_categories(name), municipality:municipalities(name), applications:job_applications(status)',
     )
     .eq('customer_id', customerId)
     .order('starts_at', { ascending: true })

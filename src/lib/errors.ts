@@ -16,6 +16,11 @@ const KNOWN: Record<string, string> = {
   invalid_min_age: 'Lágmarksaldurinn er ekki gildur fyrir þennan flokk.',
   safety_not_confirmed: 'Staðfestu öryggisatriðin til að halda áfram.',
   invalid_start_time: 'Veldu tíma sem er að minnsta kosti klukkustund fram í tímann.',
+  not_a_worker: 'Aðeins verkafólk getur sótt um verkefni.',
+  job_not_available: 'Þetta verkefni er ekki lengur í boði fyrir þig.',
+  already_applied: 'Þú hefur þegar sótt um þetta verkefni.',
+  message_too_long: 'Skilaboðin mega vera að hámarki 300 stafir.',
+  cannot_withdraw: 'Ekki er hægt að draga þessa umsókn til baka.',
   outside_allowed_hours: 'Verkefnið þarf að vera á milli kl. 06 og 22 sama dag.',
 };
 

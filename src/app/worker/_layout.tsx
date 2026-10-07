@@ -9,6 +9,7 @@ export default function WorkerLayout() {
         { name: 'applications', title: 'Umsóknir' },
         { name: 'profile', title: 'Prófíll' },
       ]}
+      hidden={['job/[id]']}
     />
   );
 }
