@@ -1,4 +1,5 @@
-// AUTO-GENERATED from the Supabase schema. Do not edit by hand.
+// Generated from the Supabase schema (Insert/Update of RPC-only tables set to `never`
+// and worker_can_take_job omitted, since clients cannot write/call them).
 // Regenerate: npx supabase gen types typescript --project-id llmwqlxtgilpvgiqskth > src/types/database.ts
 
 export type Json =
@@ -17,6 +18,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_categories: {
+        Row: {
+          active: boolean
+          description: string
+          id: number
+          legal_basis: Database["public"]["Enums"]["legal_basis"]
+          legal_reference: string
+          maximum_age: number
+          minimum_age: number
+          name: string
+          requires_manual_approval: boolean
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          safety_rules: string
+          slug: string
+          sort_order: number
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      job_private_details: {
+        Row: {
+          address: string
+          job_id: string
+          latitude: number | null
+          longitude: number | null
+        }
+        Insert: never
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "job_private_details_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          approved_at: string | null
+          area_label: string
+          assigned_worker_id: string | null
+          category_id: number
+          created_at: string
+          customer_id: string
+          description: string
+          duration_minutes: number
+          id: string
+          min_age: number
+          municipality_id: number
+          price_isk: number
+          requires_approval: boolean
+          safety_confirmed_at: string
+          starts_at: string
+          status: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: never
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "jobs_assigned_worker_id_fkey"
+            columns: ["assigned_worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "job_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       municipalities: {
         Row: {
           active: boolean
@@ -43,8 +137,17 @@ export type Database = {
       }
       platform_settings: {
         Row: {
+          adolescent_latest_end: string
+          adolescent_max_minutes: number
+          child_latest_end: string
+          child_max_age: number
+          child_max_minutes_holiday: number
+          child_max_minutes_school_term: number
           customer_min_age: number
+          earliest_start: string
           id: boolean
+          max_days_ahead: number
+          school_term_active: boolean
           updated_at: string
           worker_max_age: number
           worker_min_age: number
@@ -153,10 +256,44 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_job: {
+        Args: {
+          p_address: string
+          p_area_label: string
+          p_category_id: number
+          p_description: string
+          p_duration_minutes: number
+          p_min_age: number | null
+          p_municipality_id: number
+          p_price_isk: number
+          p_safety_confirmed: boolean
+          p_starts_at: string
+          p_title: string
+        }
+        Returns: Database["public"]["Tables"]["jobs"]["Row"]
+        SetofOptions: {
+          from: "*"
+          to: "jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_admin: { Args: never; Returns: boolean }
       today_is: { Args: never; Returns: string }
     }
     Enums: {
+      job_status:
+        | "DRAFT"
+        | "OPEN"
+        | "ASSIGNED"
+        | "IN_PROGRESS"
+        | "WORKER_COMPLETED"
+        | "COMPLETED"
+        | "REVIEWED"
+        | "CANCELLED"
+        | "DISPUTED"
+      legal_basis: "LISTED" | "INTERPRETED"
+      risk_level: "LOW" | "MEDIUM" | "HIGH"
       user_role: "CUSTOMER" | "WORKER" | "ADMIN"
       verification_status: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED"
     }
@@ -219,6 +356,19 @@ export type Enums<
 export const Constants = {
   public: {
     Enums: {
+      job_status: [
+        "DRAFT",
+        "OPEN",
+        "ASSIGNED",
+        "IN_PROGRESS",
+        "WORKER_COMPLETED",
+        "COMPLETED",
+        "REVIEWED",
+        "CANCELLED",
+        "DISPUTED",
+      ],
+      legal_basis: ["LISTED", "INTERPRETED"],
+      risk_level: ["LOW", "MEDIUM", "HIGH"],
       user_role: ["CUSTOMER", "WORKER", "ADMIN"],
       verification_status: ["UNVERIFIED", "PENDING", "VERIFIED", "REJECTED"],
     },
