@@ -12,7 +12,7 @@ Supabase security advisor, and a short report.
 | --- | --- | --- | --- |
 | 1 | Foundation | Expo SDK 57, Expo Router, strict TS, theme, env, Supabase client | ✅ |
 | 2 | Auth + profiles + roles | Email OTP, `profiles`, `complete_onboarding()`, RLS, column grants, age bounds in `platform_settings`, municipalities | ✅ |
-| 3 | Jobs + eligibility | `job_categories` (min/max age, risk, manual approval, active), `jobs` with private address columns split from public fields, status enum, create-job form, seed data (workers 12–18, jobs per category), age test matrix | next |
+| 3 | Jobs + eligibility | `job_categories` per reglugerð 426/1999, `jobs` + separate `job_private_details`, `create_job()`, `worker_can_take_job()` (age, customer min age, hours), post-job form, my-jobs list, local seed, age test matrix | ✅ |
 | 4 | Feed + details + apply | Server-side feed function (open, municipality, age-eligible, unassigned; no private fields), job details, `job_applications` (unique per worker/job, only open + eligible jobs) | |
 | 5 | Assignment + state machine | Atomic `select_worker()` (row lock; selected/not-selected applications), transition functions — no client status writes; address revealed to assigned worker only | |
 | 6 | Completion + reviews | start / worker-complete / customer-confirm, `reviews` (one per completed job, customer → worker), real completed-job count and rating on profiles | |
@@ -24,8 +24,8 @@ Supabase security advisor, and a short report.
 
 These affect legal compliance, safety or privacy, so they are asked rather than invented:
 
-1. **Category age rules for the pilot** — which categories are open to which ages.
-   Stored as data in `job_categories`, so they can change without code changes.
+1. ~~Category age rules~~ — decided: follow reglugerð 426/1999, customers may ask for older
+   workers. See docs/AGE_RULES.md for the open legal questions that remain.
 2. **When the exact address is revealed** — proposal: only to the selected worker,
    only after assignment.
 3. **Guardian involvement for workers** — whether a guardian must confirm before a

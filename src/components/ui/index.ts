@@ -1,4 +1,5 @@
 export { Button } from './Button';
+export { Checkbox } from './Checkbox';
 export { ChoiceChip } from './ChoiceChip';
 export { Input } from './Input';
 export { Screen } from './Screen';

@@ -95,11 +95,17 @@ update public.profiles set role = 'ADMIN' where id = '<user uuid>';
 
 ### Security tests
 
-`supabase/tests/foundation_security.sql` impersonates anonymous and signed-in users and
-checks the rules (age matrix, no self-promotion, no editing role/DOB/verification, users
-only see their own row, admins see all, suspended admins lose access). It always rolls
-back. Paste it into the SQL editor and run it: the result message starts with
-`ALL PASSED` or `FAILED`.
+Two SQL suites impersonate anonymous and signed-in users against the real database and
+always roll back. Paste each into the SQL editor and run it: the result message starts
+with `ALL PASSED` or `FAILED`.
+
+- `supabase/tests/foundation_security.sql` (20 checks): onboarding age matrix, no
+  self-promotion to admin, no editing role/DOB/verification, users only see their own
+  profile, admins see all, suspended admins lose access.
+- `supabase/tests/jobs_eligibility.sql` (25 checks): every category × ages 12–18
+  (63 combinations), customer's min-age request, 20:00/22:00 and 2 h/7 h working-time
+  rules, `create_job()` validation, workers and other customers cannot read jobs or
+  addresses, category ages are configuration.
 
 ## Data model (so far)
 
@@ -108,10 +114,15 @@ back. Paste it into the SQL editor and run it: the result message starts with
 | `platform_settings` | Single row: worker age range (default 13–17), customer minimum age (18) | Signed-in users read. Team edits via SQL. |
 | `municipalities` | Database-driven list (Reykjavík, Kópavogur, Hafnarfjörður, Garðabær, Mosfellsbær, Seltjarnarnes) | Public read |
 | `profiles` | One row per user, `id = auth.users.id` | Own row only (admins: all). Created **only** via `complete_onboarding()`. Users can update only `first_name`, `last_name_private`, `municipality_id`, `avatar_id`, `bio`. |
+| `job_categories` | 9 categories with min/max age, safety rules, risk, manual approval, and the legal basis for each | Signed-in users read. Team edits via SQL. |
+| `jobs` | Public job fields, status, customer's min-age request | Customer reads own jobs; admins all. **No client writes** — created via `create_job()`; status changes via functions (stage 5). |
+| `job_private_details` | Exact address / coordinates, separate from public fields | Job owner and admins only (assigned worker from stage 5). |
 
-Age is **never stored** — it is computed from `date_of_birth` by `public.age_in_years()`
-(Iceland time). Age limits are configuration, **not** legal claims: they must be verified
-against Icelandic rules before public launch.
+Age is **never stored** — it is computed from `date_of_birth`. Whether a worker may take a
+job is decided only by `public.worker_can_take_job()` (age on the job date, category,
+customer's request, time of day, length). Rules follow reglugerð 426/1999 and are all
+configuration — see **[docs/AGE_RULES.md](docs/AGE_RULES.md)**, including the open legal
+questions.
 
 ## Project structure
 
@@ -131,19 +142,30 @@ src/
   utils/               age + validation (with unit tests)
 supabase/
   migrations/          schema, RLS, functions
-  tests/               SQL security suite
+  tests/               SQL security suites
+  seed/                local-only test data
 docs/DEVELOPMENT_PLAN.md
+docs/AGE_RULES.md      how reglugerð 426/1999 is applied
 ```
 
 Code, database and comments are in English; everything users see is in Icelandic.
 
 ## Test accounts
 
-None yet. Development seed data (customers and workers aged 12–18, test jobs per
-category) arrives in stage 3 together with jobs, and will be clearly marked as test
-data. The SQL security suite creates its own temporary users and rolls them back.
+The hosted project contains **no fake data**. For a local stack (`npx supabase start`) run
+`supabase/seed/dev_seed.sql`: 2 test customers, workers aged 13–17, accounts aged 12 and
+18 without profiles, and one job per category. All emails end in `@test.ungverk.invalid`
+and all names start with “Próf”. The SQL test suites create and roll back their own users.
 
 ## Current status
+
+**Stage 3 done (categories, jobs, age eligibility):**
+
+- 9 job categories with ages based on reglugerð 426/1999; customers can ask for older workers
+- “Posta verkefni” form: category rules, date/time/length chips, age preference, live
+  “who can take this job” preview, private address, safety confirmation
+- “Mín verkefni” lists the customer's real jobs with status
+- 25/25 SQL eligibility checks, 28 unit tests
 
 **Stage 1–2 done (foundation, auth, profiles, roles):**
 
@@ -154,7 +176,7 @@ data. The SQL security suite creates its own temporary users and rolls them back
 - Suspended accounts are blocked
 - 20/20 SQL security checks, 19 unit tests
 
-**Not built yet** (screens say so honestly, no fake data): jobs, feed, applications,
+**Not built yet** (screens say so honestly, no fake data): worker job feed, applications,
 assignment, completion, reviews, reports, admin tools. See the plan.
 
 ## Known limitations
@@ -168,5 +190,7 @@ assignment, completion, reviews, reports, admin tools. See the plan.
 - Payments are not in the app. Nothing in the app claims payment processing, escrow or payouts.
 - Identity/guardian verification is not implemented; `verification_status` stays
   `UNVERIFIED` and the “Staðfest” badge only appears when it is truly `VERIFIED`.
-- Legal questions (labour rules for minors, guardian consent, privacy, insurance, tax)
-  must be verified separately before public launch.
+- Legal questions (who is the employer, guardian information, insurance, tax, privacy)
+  must be verified before public launch — see the open questions in docs/AGE_RULES.md.
+- Working-time limits are checked per job, not yet summed per day/week across jobs.
+- Jobs in “Annað” wait for admin approval, but the approval screen comes in stage 7.

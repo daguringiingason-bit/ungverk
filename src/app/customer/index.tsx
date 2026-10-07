@@ -2,12 +2,15 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PageHeader } from '@/components/PageHeader';
-import { Button, EmptyState, Screen } from '@/components/ui';
+import { CustomerJobList } from '@/components/jobs/CustomerJobList';
+import { Button, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth/AuthProvider';
+import { useMyJobs } from '@/lib/jobs/useMyJobs';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export default function CustomerHome() {
   const { profile } = useAuth();
+  const { jobs, error, retry } = useMyJobs();
   return (
     <Screen scroll edges={['top']}>
       <PageHeader title={`Hæ, ${profile?.first_name ?? ''}`} />
@@ -19,7 +22,7 @@ export default function CustomerHome() {
       <Text style={styles.section} accessibilityRole="header">
         Mín verkefni
       </Text>
-      <EmptyState title="Þú ert ekki með nein verkefni enn." />
+      <CustomerJobList jobs={jobs} error={error} onRetry={retry} />
     </Screen>
   );
 }

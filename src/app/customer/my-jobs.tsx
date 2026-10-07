@@ -1,12 +1,14 @@
 import { PageHeader } from '@/components/PageHeader';
-import { EmptyState, Screen } from '@/components/ui';
+import { CustomerJobList } from '@/components/jobs/CustomerJobList';
+import { Screen } from '@/components/ui';
+import { useMyJobs } from '@/lib/jobs/useMyJobs';
 
-// Stage 3–5: the customer's jobs grouped by status, with applicants.
 export default function CustomerJobs() {
+  const { jobs, error, retry } = useMyJobs();
   return (
     <Screen scroll edges={['top']}>
       <PageHeader title="Mín verkefni" />
-      <EmptyState title="Þú ert ekki með nein verkefni enn." />
+      <CustomerJobList jobs={jobs} error={error} onRetry={retry} />
     </Screen>
   );
 }

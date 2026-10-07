@@ -10,6 +10,13 @@ const KNOWN: Record<string, string> = {
   invalid_date_of_birth: 'Fæðingardagurinn er ekki gildur.',
   invalid_municipality: 'Veldu sveitarfélag.',
   not_authenticated: 'Þú þarft að skrá þig inn aftur.',
+  not_a_customer: 'Aðeins aðgangar sem óska eftir aðstoð geta póstað verkefnum.',
+  account_suspended: 'Aðgangurinn þinn er í biðstöðu.',
+  invalid_category: 'Veldu flokk.',
+  invalid_min_age: 'Lágmarksaldurinn er ekki gildur fyrir þennan flokk.',
+  safety_not_confirmed: 'Staðfestu öryggisatriðin til að halda áfram.',
+  invalid_start_time: 'Veldu tíma sem er að minnsta kosti klukkustund fram í tímann.',
+  outside_allowed_hours: 'Verkefnið þarf að vera á milli kl. 06 og 22 sama dag.',
 };
 
 export const GENERIC_ERROR = 'Eitthvað fór úrskeiðis. Reyndu aftur.';
