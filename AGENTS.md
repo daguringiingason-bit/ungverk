@@ -39,3 +39,12 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## ungVERK project rules
+
+- Read `README.md` and `docs/DEVELOPMENT_PLAN.md` first.
+- The database is the source of truth. Roles, ages, permissions and job status transitions are enforced in Postgres (RLS, column grants, `security definer` functions). Never move that logic into the client, never disable RLS, never ship the service-role key.
+- Every schema change is a new file in `supabase/migrations/`; extend `supabase/tests/` for every new permission.
+- English for code and database; natural Icelandic for every user-facing string.
+- No fake data, fake payments or fake verification in the product.
+- Run `npm run check` before finishing any task.
